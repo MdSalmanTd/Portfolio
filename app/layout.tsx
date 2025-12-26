@@ -3,12 +3,13 @@ import { Geist, Geist_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import Navbar from "../components/Navbar";
+import Preloader from "./preloader";
 
-const Masiku = localFont ({
-  src: [{path: "/fonts/Masiku.ttf", weight: "400", style: "normal"}],
+const Masiku = localFont({
+  src: [{ path: "/fonts/Masiku.ttf", weight: "400", style: "normal" }],
 });
 
- const drukCondSuper = localFont({
+const drukCondSuper = localFont({
   src: [
     { path: '/fonts/DrukCondTrialSuper.ttf', weight: '900', style: 'normal' },
   ],
@@ -50,6 +51,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} relative flex min-h-screen flex-col `}>
+        <Preloader duration={4600} />
         <Navbar />
         {children}
       </body>

@@ -1,5 +1,5 @@
 "use client";
-import LogoLoop from './LogoLoop';
+import LogoLoop from './ui/LogoLoop';
 import {
   SiReact,SiNextdotjs,SiTypescript, SiTailwindcss,SiPostgresql, SiMongodb,SiPostman, SiDocker,SiVercel, SiGithub,
 } from "react-icons/si";

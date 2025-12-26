@@ -1,6 +1,6 @@
 'use client';
 import React from 'react'
-import { ScrollVelocity } from '@/components/ScrollVelocity';
+import { ScrollVelocity } from '@/components/ui/ScrollVelocity';
 
 const TextSlide = () => {
   return (

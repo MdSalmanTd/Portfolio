@@ -1,7 +1,11 @@
 'use client';
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { FaCaretDown,FaCode,FaPenNib   } from "react-icons/fa";
 import { LuSwatchBook } from "react-icons/lu";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const iconMap = {
   FaCode,
@@ -38,21 +42,102 @@ const services = [
 
 const Expertise = () => {
    const [active, setActive] = useState("dev");
+   const descRefs = useRef<{ [key: string]: HTMLParagraphElement | null }>({});
+   const sectionRef = useRef<HTMLElement>(null);
+   const headingRef = useRef<HTMLDivElement>(null);
+   const titleRef = useRef<HTMLHeadingElement>(null);
+   const buttonsRef = useRef<HTMLDivElement>(null);
+   const imageRef = useRef<HTMLDivElement>(null);
+
+  // Scroll-triggered animation (runs once)
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 80%",
+          end: "top 20%",
+          toggleActions: "play none none none",
+        }
+      });
+
+      tl.fromTo(
+        headingRef.current,
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }
+      )
+      .fromTo(
+        titleRef.current,
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
+        "-=0.4"
+      )
+      .fromTo(
+        buttonsRef.current?.children || [],
+        { opacity: 0, x: -30 },
+        { opacity: 1, x: 0, duration: 0.5, stagger: 0.1, ease: "power2.out" },
+        "-=0.3"
+      )
+      .fromTo(
+        imageRef.current,
+        { opacity: 0, scale: 0.9 },
+        { opacity: 1, scale: 1, duration: 0.7, ease: "power2.out" },
+        "-=0.5"
+      );
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  // Accordion animation
+  useEffect(() => {
+    services.forEach((item) => {
+      const element = descRefs.current[item.id];
+      if (element) {
+        if (active === item.id) {
+          gsap.fromTo(
+            element,
+            { 
+              height: 0, 
+              opacity: 0,
+              marginTop: 0
+            },
+            { 
+              height: "auto", 
+              opacity: 1,
+              marginTop: 12,
+              duration: 0.4,
+              ease: "power2.out"
+            }
+          );
+        } else {
+          gsap.to(element, {
+            height: 0,
+            opacity: 0,
+            marginTop: 0,
+            duration: 0.3,
+            ease: "power2.in"
+          });
+        }
+      }
+    });
+  }, [active]);
 
   return (
-    <section className="relative mx-auto max-w-7xl px-6 py-20 mt-20">
-      <div className="grid gap-10 md:grid-cols-2 items-center">
+    <section ref={sectionRef} className="relative mx-auto max-w-7xl px-6 py-20 mt-20">
+      <div ref={headingRef}>
+        <p className="mb-3 text-md uppercase tracking-wider text-orange-400">
+          Speciality
+        </p>
+      </div>
+      <div className="grid gap-10 md:grid-cols-2 items-start">
 
         <div>
-          <p className="mb-3 text-md uppercase tracking-wider text-orange-400">
-            Speciality
-          </p>
-
-          <h2 className="mb-8 text-4xl font-semibold text-white">
+          <h2 ref={titleRef} className="mb-8 text-4xl font-semibold text-white">
             Areas of Expertise
           </h2>
 
-          <div className="space-y-4">
+          <div ref={buttonsRef} className="space-y-4">
             {services.map((item) => {
               const isActive = active === item.id;
               const Icon = iconMap[item.icon];
@@ -60,7 +145,7 @@ const Expertise = () => {
                 <button
                   key={item.id}
                   onClick={() => setActive(item.id)}
-                  className={`w-full rounded-2xl border p-5 text-left transition-all
+                  className={`w-full rounded-2xl border p-5 text-left transition-all overflow-hidden
                     ${
                       isActive
                         ? "border-orange-500 bg-zinc-950"
@@ -76,7 +161,7 @@ const Expertise = () => {
                     </h3>
                     </span>
                     <span
-                      className={`transition-transform ${
+                      className={`transition-transform duration-300 ${
                         isActive ? "rotate-180" : ""
                       }`}
                     >
@@ -84,18 +169,20 @@ const Expertise = () => {
                     </span>
                   </div>
 
-                  {isActive && (
-                    <p className="mt-3 text-sm bg-zinc-950">
-                      {item.description}
-                    </p>
-                  )}
+                  <p 
+                    ref={(el) => { descRefs.current[item.id] = el; }}
+                    className="text-sm bg-zinc-950 overflow-hidden"
+                    style={{ height: isActive ? 'auto' : 0, opacity: isActive ? 1 : 0 }}
+                  >
+                    {item.description}
+                  </p>
                 </button>
               );
             })}
           </div>
         </div>
 
-        <div className="relative aspect-video w-full overflow-hidden rounded-3xl bg-neutral-900">
+        <div ref={imageRef} className="relative aspect-video w-full overflow-hidden rounded-3xl bg-neutral-900">
           {services.map((item) => (
             <img
               key={item.id}
