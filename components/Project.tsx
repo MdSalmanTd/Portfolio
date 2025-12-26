@@ -1,5 +1,9 @@
 'use client';
-import React from "react";
+import React, { useRef, useEffect } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const projects = [
     {
@@ -33,14 +37,51 @@ const projects = [
 ];
 
 const Project = () => {
+    const sectionRef = useRef<HTMLDivElement>(null);
+    const tagRef = useRef<HTMLHeadingElement>(null);
+    const titleRef = useRef<HTMLHeadingElement>(null);
+    const descRef = useRef<HTMLParagraphElement>(null);
+
+    useEffect(() => {
+        const ctx = gsap.context(() => {
+            const tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: sectionRef.current,
+                    start: "top 80%",
+                    toggleActions: "play none none none",
+                }
+            });
+
+            tl.fromTo(
+                tagRef.current,
+                { opacity: 0, y: 20 },
+                { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }
+            )
+            .fromTo(
+                titleRef.current,
+                { opacity: 0, y: 20 },
+                { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
+                "-=0.4"
+            )
+            .fromTo(
+                descRef.current,
+                { opacity: 0, y: 20 },
+                { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" },
+                "-=0.4"
+            );
+        }, sectionRef);
+
+        return () => ctx.revert();
+    }, []);
+
     return (
-        <div className="max-w-7xl mx-auto px-4 py-30">
+        <div ref={sectionRef} id="works" className="max-w-7xl mx-auto px-4 py-30">
             {/* Header */}
-            <h3 className="text-lg mb-3 text-md uppercase tracking-wider text-orange-400">My Work</h3>
-            <h2 className="text-4xl md:text-5xl font-medium mb-4">
+            <h3 ref={tagRef} className="text-lg mb-3 text-md uppercase tracking-wider text-orange-400">My Work</h3>
+            <h2 ref={titleRef} className="text-4xl md:text-5xl font-medium mb-4">
                 Selected Projects
             </h2>
-            <p className="text-white/60 max-w-xl mb-10">
+            <p ref={descRef} className="text-white/60 max-w-xl mb-10">
                 Here's a curated selection showcasing my expertise and the results
                 I’ve delivered through real-world projects.
             </p>

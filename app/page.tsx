@@ -1,4 +1,3 @@
-'use client';
 import Hero from '@/components/Hero';
 import Stack from '@/components/Stack'
 import About from '@/components/About';
